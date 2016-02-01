@@ -1,0 +1,13 @@
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+repositories {
+    maven {
+        name = 'sponge'
+        url = 'http://repo.spongepowered.org/maven'
+    }
+}
+
+dependencies {
+    compile 'org.spongepowered:spongeapi:3.0.0'
+}
