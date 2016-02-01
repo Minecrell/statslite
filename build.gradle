@@ -3,25 +3,72 @@ allprojects {
     version = '1.0-SNAPSHOT'
 
     apply plugin: 'java'
+    apply plugin: 'eclipse'
+    apply plugin: 'idea'
 
     sourceCompatibility = '1.7'
     targetCompatibility = '1.7'
 
+    configurations {
+        provided
+    }
+
+    sourceSets {
+        main {
+            compileClasspath += configurations.provided
+        }
+    }
+
+    eclipse {
+        classpath {
+            plusConfigurations += [configurations.provided]
+        }
+    }
+
+    idea {
+        module {
+            scopes.PROVIDED.plus += [configurations.provided]
+        }
+    }
+
     repositories {
         mavenCentral()
+    }
+
+    task sourceJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    apply plugin: 'maven-publish'
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+
+                artifact sourceJar
+            }
+        }
     }
 }
 
 subprojects {
     dependencies {
-        compile rootProject
+        provided rootProject
     }
 
-    archivesBaseName = "$rootProject.name-$project.name"
+    jar {
+        from rootProject.sourceSets.main.output
+    }
+
+    sourceJar {
+        from rootProject.sourceSets.main.allSource
+    }
 }
 
 dependencies {
-    compile 'com.google.code.gson:gson:2.2.4'
+    provided 'com.google.code.gson:gson:2.2.4'
 }
 
 task wrapper(type: Wrapper) {

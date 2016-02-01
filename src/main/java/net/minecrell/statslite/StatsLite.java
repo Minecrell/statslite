@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -18,6 +19,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
 
 public abstract class StatsLite implements Runnable {
+
+    private static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("statslite.debug", "false"));
 
     private static final int REVISION = 7; // Plugin-Metrics revision
     private static final String BASE_URL = "http://report.mcstats.org";
@@ -32,6 +35,7 @@ public abstract class StatsLite implements Runnable {
 
     private boolean running;
     private boolean ping;
+    private boolean warned;
 
     protected StatsLite(ConfigProvider config) {
         this.config = requireNonNull(config, "config");
@@ -72,10 +76,16 @@ public abstract class StatsLite implements Runnable {
         try {
             post(this.config.getUniqueId(), this.ping);
             this.ping = true;
+            this.warned = false;
         } catch (Exception e) {
-            this.handleException(e);
+            if (!this.warned) {
+                this.warned = true;
+                this.handleException(e);
+            }
         }
     }
+
+    protected abstract void debug(String message);
 
     protected abstract void handleException(Exception e);
 
@@ -127,6 +137,11 @@ public abstract class StatsLite implements Runnable {
 
         // Get json output from GSON
         String json = gson.toJson(jsonData);
+
+        if (DEBUG) {
+            this.debug("Generated json request: " + json);
+        }
+
         byte[] data = json.getBytes(StandardCharsets.UTF_8);
         byte[] gzip = null;
 
@@ -152,6 +167,10 @@ public abstract class StatsLite implements Runnable {
 
         con.setDoOutput(true);
 
+        if (DEBUG) {
+            this.debug("Sending " + data.length + " bytes to " + url);
+        }
+
         // Write json data to the opened stream
         try (OutputStream out = con.getOutputStream()) {
             out.write(data);
@@ -160,6 +179,11 @@ public abstract class StatsLite implements Runnable {
         String response; // Read the response
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()))) {
             response = reader.readLine();
+        }
+
+        if (DEBUG) {
+            HttpURLConnection http = (HttpURLConnection) con;
+            this.debug("Server replied with '" + response + "' (" + http.getResponseCode() + " - " + http.getResponseMessage() + ')');
         }
 
         if (response == null || response.startsWith("ERR") || response.startsWith("7")) {
