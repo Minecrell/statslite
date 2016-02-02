@@ -21,6 +21,8 @@
  */
 package net.minecrell.statslite;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -41,8 +43,8 @@ public final class SpongeStatsLite extends StatsLite {
 
     @Inject
     public SpongeStatsLite(PluginContainer plugin, @ConfigDir(sharedRoot = true) Path configDir) {
-        super(new SimpleConfigFileProvider(configDir.resolve("statslite.properties")));
-        this.plugin = plugin;
+        super(configDir);
+        this.plugin = requireNonNull(plugin, "plugin");
     }
 
     @Override

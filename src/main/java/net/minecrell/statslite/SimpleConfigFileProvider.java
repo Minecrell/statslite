@@ -32,14 +32,14 @@ import java.nio.file.StandardOpenOption;
 import java.util.Properties;
 import java.util.UUID;
 
-public final class SimpleConfigFileProvider implements StatsLite.ConfigProvider {
+final class SimpleConfigFileProvider implements StatsLite.ConfigProvider {
 
     private final Path configFile;
 
     private boolean optOut;
     private String uniqueId;
 
-    public SimpleConfigFileProvider(Path configFile) {
+    SimpleConfigFileProvider(Path configFile) {
         this.configFile = requireNonNull(configFile, "configFile");
     }
 

@@ -36,12 +36,14 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
 
 public abstract class StatsLite implements Runnable {
 
     private static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("statslite.debug"));
+    private static final String DEFAULT_CONFIG_FILE = "statslite.properties";
 
     private static final int REVISION = 7; // Plugin-Metrics revision
     private static final String BASE_URL = "http://report.mcstats.org";
@@ -62,14 +64,23 @@ public abstract class StatsLite implements Runnable {
         this.config = requireNonNull(config, "config");
     }
 
+    protected StatsLite(Path configDir) {
+        requireNonNull(configDir, "configDir");
+        this.config = new SimpleConfigFileProvider(configDir.resolve(DEFAULT_CONFIG_FILE));
+    }
+
     protected abstract boolean register(int interval, TimeUnit unit);
 
-    public final boolean start() throws IOException {
+    public final boolean start() {
         if (!this.running) {
-            this.config.reload();
-            if (!this.config.isOptOut() && register(PING_INTERVAL, PING_INTERVAL_UNIT)) {
-                this.running = true;
-                return true;
+            try {
+                this.config.reload();
+                if (!this.config.isOptOut() && register(PING_INTERVAL, PING_INTERVAL_UNIT)) {
+                    this.running = true;
+                    return true;
+                }
+            } catch (Exception e) {
+                this.handleException(e);
             }
         }
 
@@ -112,11 +123,14 @@ public abstract class StatsLite implements Runnable {
 
     protected abstract boolean cancel();
 
-    public final void stop() {
+    public final boolean stop() {
         if (this.running && this.cancel()) {
             this.running = false;
             this.ping = false;
+            return true;
         }
+
+        return false;
     }
 
     protected abstract String getPluginName();
