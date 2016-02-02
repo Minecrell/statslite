@@ -1,3 +1,3 @@
 rootProject.name = 'statslite'
-include 'sponge'
+include 'sponge', 'bungee'
 rootProject.children.each { it.name = "$rootProject.name-$it.name" }

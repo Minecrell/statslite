@@ -24,46 +24,35 @@ package net.minecrell.statslite;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.Throwables;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import org.spongepowered.api.Platform;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.config.ConfigDir;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.scheduler.Task;
+import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.api.scheduler.ScheduledTask;
 
-import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
-@Singleton
-public final class SpongeStatsLite extends StatsLite {
+public final class BungeeStatsLite extends StatsLite {
 
-    private final PluginContainer plugin;
-    private Task task;
+    private final Plugin plugin;
+    private ScheduledTask task;
 
-    @Inject
-    public SpongeStatsLite(PluginContainer plugin, @ConfigDir(sharedRoot = true) Path configDir) {
-        super(configDir);
+    public BungeeStatsLite(Plugin plugin) {
+        super(BungeeConfigProvider.INSTANCE);
         this.plugin = requireNonNull(plugin, "plugin");
     }
 
     @Override
     protected void register(int interval, TimeUnit unit) {
-        this.task = Sponge.getScheduler().createTaskBuilder()
-                .async()
-                .interval(interval, unit)
-                .execute(this)
-                .submit(this.plugin);
+        this.task = this.plugin.getProxy().getScheduler().schedule(this.plugin, this, 0, interval, unit);
     }
 
     @Override
     protected void debug(String message) {
-        this.plugin.getLogger().debug(message);
+        this.plugin.getLogger().log(Level.FINE, message);
     }
 
     @Override
     protected void handleException(Exception e) {
-        this.plugin.getLogger().warn("Failed to submit plugin statistics: {}", Throwables.getRootCause(e).toString());
+        this.plugin.getLogger().log(Level.WARNING, "Failed to submit plugin statistics: {0}", Throwables.getRootCause(e).toString());
     }
 
     @Override
@@ -74,29 +63,27 @@ public final class SpongeStatsLite extends StatsLite {
 
     @Override
     protected String getPluginName() {
-        return this.plugin.getName();
+        return this.plugin.getDescription().getName();
     }
 
     @Override
     protected String getPluginVersion() {
-        return this.plugin.getVersion();
+        return this.plugin.getDescription().getVersion();
     }
 
     @Override
     protected String getServerVersion() {
-        final Platform platform = Sponge.getPlatform();
-        return platform.getImplementation().getName() + ' ' + platform.getImplementation().getVersion()
-                + " (MC: " + platform.getMinecraftVersion().getName() + ')';
+        return this.plugin.getProxy().getVersion() + " (MC: " + this.plugin.getProxy().getGameVersion() + ')';
     }
 
     @Override
     protected int getOnlinePlayerCount() {
-        return Sponge.getServer().getOnlinePlayers().size();
+        return this.plugin.getProxy().getOnlineCount();
     }
 
     @Override
     protected boolean isOnlineMode() {
-        return Sponge.getServer().getOnlineMode();
+        return this.plugin.getProxy().getConfig().isOnlineMode();
     }
 
 }

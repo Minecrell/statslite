@@ -69,14 +69,15 @@ public abstract class StatsLite implements Runnable {
         this.config = new SimpleConfigFileProvider(configDir.resolve(DEFAULT_CONFIG_FILE));
     }
 
-    protected abstract boolean register(int interval, TimeUnit unit);
+    protected abstract void register(int interval, TimeUnit unit);
 
     public final boolean start() {
         if (!this.running) {
             try {
                 this.config.reload();
-                if (!this.config.isOptOut() && register(PING_INTERVAL, PING_INTERVAL_UNIT)) {
+                if (!this.config.isOptOut()) {
                     this.running = true;
+                    register(PING_INTERVAL, PING_INTERVAL_UNIT);
                     return true;
                 }
             } catch (Exception e) {
@@ -121,11 +122,12 @@ public abstract class StatsLite implements Runnable {
 
     protected abstract void handleException(Exception e);
 
-    protected abstract boolean cancel();
+    protected abstract void cancel();
 
     public final boolean stop() {
-        if (this.running && this.cancel()) {
+        if (this.running) {
             this.running = false;
+            this.cancel();
             this.ping = false;
             return true;
         }
