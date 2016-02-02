@@ -52,6 +52,12 @@ allprojects {
                 from components.java
 
                 artifact sourceJar
+
+                repositories {
+                    maven {
+                        url = System.getenv('REPO_' + (version.endsWith('-SNAPSHOT') ? 'SNAPSHOTS' : 'RELEASES')) ?: "$buildDir/repo"
+                    }
+                }
             }
         }
     }
