@@ -158,7 +158,7 @@ public abstract class StatsLite implements Runnable {
 
         jsonData.addProperty("server_version", serverVersion);
         jsonData.addProperty("players_online", online);
-        jsonData.addProperty("auth_mode", onlineMode ? 1 : 0);
+        jsonData.addProperty("auth_mode", onlineMode);
 
         // New data as of R6, system information
         jsonData.addProperty("osname", System.getProperty("os.name"));
@@ -169,7 +169,7 @@ public abstract class StatsLite implements Runnable {
         jsonData.addProperty("java_version", System.getProperty("java.version"));
 
         if (ping) {
-            jsonData.addProperty("ping", 1);
+            jsonData.addProperty("ping", true);
         }
 
         // Get json output from GSON
