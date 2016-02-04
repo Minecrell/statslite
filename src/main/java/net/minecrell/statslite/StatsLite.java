@@ -58,7 +58,6 @@ public abstract class StatsLite implements Runnable {
 
     private boolean running;
     private boolean ping;
-    private boolean warned;
 
     protected StatsLite(ConfigProvider config) {
         this.config = requireNonNull(config, "config");
@@ -81,7 +80,7 @@ public abstract class StatsLite implements Runnable {
                     return true;
                 }
             } catch (Exception e) {
-                this.handleException(e);
+                this.handleException("Failed to start plugin statistic client", e);
             }
         }
 
@@ -95,7 +94,7 @@ public abstract class StatsLite implements Runnable {
         } catch (IOException e) {
             // If we can't read the configuration we can likely not
             // later either, so just stop trying
-            this.handleException(e);
+            this.handleException("Failed to reload statslite configuration", e);
             this.stop();
         }
 
@@ -109,18 +108,16 @@ public abstract class StatsLite implements Runnable {
         try {
             post(this.config.getUniqueId(), this.ping);
             this.ping = true;
-            this.warned = false;
         } catch (Exception e) {
-            if (!this.warned) {
-                this.warned = true;
-                this.handleException(e);
-            }
+            this.handleSubmitException(e);
         }
     }
 
     protected abstract void debug(String message);
 
-    protected abstract void handleException(Exception e);
+    protected abstract void handleException(String message, Exception e);
+
+    protected abstract void handleSubmitException(Exception e);
 
     protected abstract void cancel();
 

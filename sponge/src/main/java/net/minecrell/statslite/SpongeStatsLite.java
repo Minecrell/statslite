@@ -62,7 +62,12 @@ public final class SpongeStatsLite extends StatsLite {
     }
 
     @Override
-    protected void handleException(Exception e) {
+    protected void handleException(String message, Exception e) {
+        this.plugin.getLogger().warn(message, e);
+    }
+
+    @Override
+    protected void handleSubmitException(Exception e) {
         this.plugin.getLogger().debug("Failed to submit plugin statistics: {}", Throwables.getRootCause(e).toString());
     }
 
