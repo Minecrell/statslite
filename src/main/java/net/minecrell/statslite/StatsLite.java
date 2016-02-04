@@ -76,6 +76,7 @@ public abstract class StatsLite implements Runnable {
                 this.config.reload();
                 if (!this.config.isOptOut()) {
                     this.running = true;
+                    this.ping = false;
                     register(PING_INTERVAL, PING_INTERVAL_UNIT);
                     return true;
                 }
@@ -125,7 +126,6 @@ public abstract class StatsLite implements Runnable {
         if (this.running) {
             this.running = false;
             this.cancel();
-            this.ping = false;
             return true;
         }
 
