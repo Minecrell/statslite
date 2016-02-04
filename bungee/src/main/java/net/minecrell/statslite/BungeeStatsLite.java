@@ -52,7 +52,7 @@ public final class BungeeStatsLite extends StatsLite {
 
     @Override
     protected void handleException(Exception e) {
-        this.plugin.getLogger().log(Level.WARNING, "Failed to submit plugin statistics: {0}", Throwables.getRootCause(e).toString());
+        this.plugin.getLogger().log(Level.FINE, "Failed to submit plugin statistics: {0}", Throwables.getRootCause(e).toString());
     }
 
     @Override
