@@ -35,7 +35,7 @@ import java.util.logging.Level;
  *
  * <p>Example usage for plugins:
  * <pre>
- *     private {@link BungeeStatsLite} stats = new {@link BungeeStatsLite};
+ *     private final {@link BungeeStatsLite} stats = new {@link BungeeStatsLite}(this);
  *
  *     {@link Override @Override}
  *     public void onEnable() {
