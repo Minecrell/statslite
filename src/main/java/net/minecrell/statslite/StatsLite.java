@@ -37,9 +37,31 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
 
+/**
+ * A simple client implementation for <a href="http://mcstats.org">MCStats</a>
+ * that works on multiple platforms. It can be used to send statistical data
+ * for plugins to MCStats. Currently, the following data is transmitted:
+ *
+ * <ul>
+ *     <li>Plugin name</li>
+ *     <li>Plugin version</li>
+ *     <li>Server version</li>
+ *     <li>Online player count</li>
+ *     <li>Online mode</li>
+ *     <li>Operating system name, version, architecture and the number of cores
+ *         on the host system</li>
+ *     <li>Java version</li>
+ * </ul>
+ *
+ * <p>Currently, custom graphs are not supported.</p>
+ *
+ * <p>Implementations for platforms need to extend this class to provide the
+ * getters for the platform-specific data and to schedule the task.</p>
+ */
 public abstract class StatsLite implements Runnable {
 
     private static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("statslite.debug"));
@@ -59,17 +81,50 @@ public abstract class StatsLite implements Runnable {
     private boolean running;
     private boolean ping;
 
+    /**
+     * Constructs a new {@link StatsLite} client using a custom
+     * {@link ConfigProvider}.
+     *
+     * <p><b>Note:</b> In most cases it is recommended to use the default config
+     * provider that stores the settings for disabling in a file.</p>
+     *
+     * @param config The custom config provider
+     */
     protected StatsLite(ConfigProvider config) {
         this.config = requireNonNull(config, "config");
     }
 
+    /**
+     * Constructs a new {@link StatsLite} client using the standard
+     * {@link ConfigProvider} that stores the configuration in a file in the
+     * given config directory.
+     *
+     * @param configDir The directory to store the config file in
+     */
     protected StatsLite(Path configDir) {
         requireNonNull(configDir, "configDir");
         this.config = new SimpleConfigFileProvider(configDir.resolve(DEFAULT_CONFIG_FILE));
     }
 
+    /**
+     * Registers this {@link Runnable} with the specified interval on the
+     * platform-specific scheduler.
+     *
+     * @param interval The interval to execute the task in
+     * @param unit The unit the interval is in
+     */
     protected abstract void register(int interval, TimeUnit unit);
 
+    /**
+     * Attempts to start the {@link StatsLite} client and returns whether the
+     * operation was successful.
+     *
+     * <p>Unsuccessful starting on the client does not necessarily mean
+     * something is broken, because it the client will disable itself
+     * if the user has chosen to opt-out the plugin statistics.</p>
+     *
+     * @return True if the operation was successful
+     */
     public final boolean start() {
         if (!this.running) {
             try {
@@ -88,6 +143,11 @@ public abstract class StatsLite implements Runnable {
         return false;
     }
 
+    /**
+     * Submits the statistic data on the current thread. If the user has
+     * modified the configuration in the meantime the task will disable
+     * itself if the user has chosen to opt-out.
+     */
     @Override
     public final void run() {
         try {
@@ -114,14 +174,43 @@ public abstract class StatsLite implements Runnable {
         }
     }
 
+    /**
+     * Sends the specified message to a debug logger.
+     *
+     * @param message The message to log
+     */
     protected abstract void debug(String message);
 
+    /**
+     * Reports the exceptions together with the specified message on the logger.
+     * <p><b>Note:</b> This should generally report on the <i>warn</i> level.</p>
+     *
+     * @param message The message to log
+     * @param e The exception to log
+     */
     protected abstract void handleException(String message, Exception e);
 
+    /**
+     * Reports an exception that has happened while submitting the statistic data
+     * on the logger.
+     * <p><b>Note:</b> This should generally report on the <i>debug</i> level.</p>
+     *
+     * @param e The exception to log
+     */
     protected abstract void handleSubmitException(Exception e);
 
+    /**
+     * Cancels the scheduled task so it is no longer executed. This method is
+     * only called if the task was actually scheduled before.
+     */
     protected abstract void cancel();
 
+    /**
+     * Attempts to stop the currently scheduled task so the client will no longer
+     * submit statistic data to the server.
+     *
+     * @return If the client was running before
+     */
     public final boolean stop() {
         if (this.running) {
             this.running = false;
@@ -132,11 +221,44 @@ public abstract class StatsLite implements Runnable {
         return false;
     }
 
+    /**
+     * Returns the display name of the plugin.
+     *
+     * @return The plugin display name
+     */
     protected abstract String getPluginName();
+
+    /**
+     * Returns the display version of the plugin.
+     *
+     * @return The plugin display version
+     */
     protected abstract String getPluginVersion();
 
+    /**
+     * Returns an unique version string for the currently running server
+     * implementation.
+     *
+     * <p>The underlying Minecraft version should be defined as a suffix in the
+     * following format: {@code (MC: 1.8.9)}</p>
+     *
+     * @return The server version
+     */
     protected abstract String getServerVersion();
+
+    /**
+     * Returns the current count of online players on the server.
+     *
+     * @return The online player count
+     */
     protected abstract int getOnlinePlayerCount();
+
+    /**
+     * Returns whether the server is running in online mode and is authenticating
+     * the users with Mojang.
+     *
+     * @return Whether the server is running in online mode
+     */
     protected abstract boolean isOnlineMode();
 
     private void post(String guid, boolean ping) throws IOException {
@@ -239,11 +361,32 @@ public abstract class StatsLite implements Runnable {
         return out.toByteArray();
     }
 
+    /**
+     * Represents a configuration provider for a {@link StatsLite} client.
+     */
     public interface ConfigProvider {
 
+        /**
+         * Reloads the configuration from the source.
+         *
+         * @throws IOException If the configuration can't be read
+         */
         void reload() throws IOException;
 
+        /**
+         * Returns whether the user has opted-out and chosen to disable the
+         * statistic client.
+         *
+         * @return Whether the user has opted-out
+         */
         boolean isOptOut();
+
+        /**
+         * Returns the string representation of an {@link UUID} for the current
+         * server.
+         *
+         * @return The unique identifier
+         */
         String getUniqueId();
 
     }

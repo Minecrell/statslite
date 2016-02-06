@@ -32,6 +32,11 @@ import java.nio.file.StandardOpenOption;
 import java.util.Properties;
 import java.util.UUID;
 
+/**
+ * A simple {@link StatsLite.ConfigProvider} that loads the configuration from
+ * a simple {@link Properties} file ({@code statslite.properties}) from the
+ * specified configuration directory.
+ */
 final class SimpleConfigFileProvider implements StatsLite.ConfigProvider {
 
     private final Path configFile;

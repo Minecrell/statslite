@@ -6,13 +6,5 @@ jdk:
   - openjdk8
   - oraclejdk8
 
-env:
-  global:
-    - LAPIS_DEPLOY=http://github.com/LapisBlue/Deploy.git DEPLOY_ROOT=/tmp/lapis/deploy
-    - GIT_REPO=git@github.com:Minecrell/Repo.git
-    - secure: "ISdJmhlxt0hGsyX4os+Z5uTTVawp2ENLWx3qJ6SAfotRbqg27oiXN6Ofsxdl60kjeb6cOO0+M7pf/IcGBdyZG4bZqNsDCZwdKddzymHOGVoCK41RWbaQGC1I9vdGllmJ3DePvR1Y1A7J+XPxs98LaoKUwszvxx9PDBJA/XC3Z8zP4YjIBpeV7X0fuZg3c5DfGJWbmOMFk0qiI26HaE1lEAZV776qJWvJs7E1jg/gw/8VEM8h1xn2jgjFpLA7BYNadcOBX/OmWpdhbX+ML6ZwuOiWXjQNUUQMl3tMbStej2nna0C5BZoReEgBszDqJR+j5vqX7MTEN1TxhQXVsT7yAsoBpUAI0+tu+guEJ/QuglM0YCY3gPHqudsNZv4MX7jbHJkzhd+bNWMnSxQCRdx+IJdT+YbhfNwiAy7kbbtV+5rKwLmYbnYr9njkYjvAunt1ayiQQVtdVnBVqtyW/10hOH95y69CLdCKZMtKW0aVW3yCFelJeTQAOILF03kZmtYIc8kwiU/AcEWr3Hglp+zT5gKPWFtNSixSDaJswDeaB3DDMhqwynt3ZOlzRVdrC+yjL2j4i3ndguTC0b3bp49TvVA3mF2cdyluyR85KnEXVfJ+LOws9NJLnox2CJM0FTkmrro7oJjegges5yhmeLfax/+UgFRk5C6bu5l2IZfiQ7A="
-
-after_success: git clone $LAPIS_DEPLOY $DEPLOY_ROOT && $DEPLOY_ROOT/maven_repo "gradle publish" openjdk8
-
 notifications:
   email: false

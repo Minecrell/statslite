@@ -30,11 +30,31 @@ import net.md_5.bungee.api.scheduler.ScheduledTask;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+/**
+ * A simple BungeeCord implementation of {@link StatsLite}.
+ *
+ * <p>Example usage for plugins:
+ * <pre>
+ *     private {@link BungeeStatsLite} stats = new {@link BungeeStatsLite};
+ *
+ *     {@link Override @Override}
+ *     public void onEnable() {
+ *         this.stats.start();
+ *     }
+ * </pre>
+ *
+ * @see StatsLite
+ */
 public final class BungeeStatsLite extends StatsLite {
 
     private final Plugin plugin;
     private ScheduledTask task;
 
+    /**
+     * Constructs a new {@link BungeeStatsLite} client for the specified plugin.
+     *
+     * @param plugin The plugin
+     */
     public BungeeStatsLite(Plugin plugin) {
         super(BungeeConfigProvider.INSTANCE);
         this.plugin = requireNonNull(plugin, "plugin");

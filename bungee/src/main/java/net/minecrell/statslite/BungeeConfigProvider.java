@@ -23,6 +23,10 @@ package net.minecrell.statslite;
 
 import net.md_5.bungee.api.ProxyServer;
 
+/**
+ * A simple {@link StatsLite.ConfigProvider} for BungeeCord that uses
+ * the properties defined in the BungeeCord configuration.
+ */
 final class BungeeConfigProvider implements StatsLite.ConfigProvider {
 
     static final BungeeConfigProvider INSTANCE = new BungeeConfigProvider();

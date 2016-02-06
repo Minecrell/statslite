@@ -29,18 +29,43 @@ import com.google.inject.Singleton;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
 
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * A simple {@link Sponge} implementation of {@link StatsLite}.
+ *
+ * <p>Example usage for plugins:
+ * <pre>
+ *     {@link Inject @Inject} public {@link SpongeStatsLite} stats;
+ *
+ *     {@link Listener @Listener}
+ *     public void onPreInitialize({@link GamePreInitializationEvent} event) {
+ *         this.stats.start();
+ *     }
+ * </pre>
+ *
+ * @see StatsLite
+ */
 @Singleton
 public final class SpongeStatsLite extends StatsLite {
 
     private final PluginContainer plugin;
     private Task task;
 
+    /**
+     * Constructs a new {@link SpongeStatsLite} client. Normally this should
+     * be not called manually, but rather through an Guice {@link Inject}.
+     *
+     * @param plugin The plugin container
+     * @param configDir The shared config directory
+     * @see SpongeStatsLite
+     */
     @Inject
     public SpongeStatsLite(PluginContainer plugin, @ConfigDir(sharedRoot = true) Path configDir) {
         super(configDir);
