@@ -19,66 +19,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.minecrell.statslite;
+package net.minecrell.mcstats;
 
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.Throwables;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import org.spongepowered.api.Platform;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.config.ConfigDir;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.scheduler.Task;
+import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.api.scheduler.ScheduledTask;
 
-import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 /**
- * A simple {@link Sponge} implementation of {@link StatsLite}.
+ * A simple BungeeCord implementation of {@link StatsLite}.
  *
  * <p>Example usage for plugins:
  * <pre>
- *     {@link Inject @Inject} public {@link SpongeStatsLite} stats;
+ *     private final {@link BungeeStatsLite} stats = new {@link BungeeStatsLite}(this);
  *
- *     {@link Listener @Listener}
- *     public void onPreInitialize({@link GamePreInitializationEvent} event) {
+ *     {@link Override @Override}
+ *     public void onEnable() {
  *         this.stats.start();
  *     }
  * </pre>
  *
  * @see StatsLite
  */
-@Singleton
-public final class SpongeStatsLite extends StatsLite {
+public final class BungeeStatsLite extends StatsLite {
 
-    private final PluginContainer plugin;
-    private Task task;
+    private final Plugin plugin;
+    private ScheduledTask task;
 
     /**
-     * Constructs a new {@link SpongeStatsLite} client. Normally this should
-     * be not called manually, but rather through an Guice {@link Inject}.
+     * Constructs a new {@link BungeeStatsLite} client for the specified plugin.
      *
-     * @param plugin The plugin container
-     * @param configDir The shared config directory
-     * @see SpongeStatsLite
+     * @param plugin The plugin
      */
-    @Inject
-    public SpongeStatsLite(PluginContainer plugin, @ConfigDir(sharedRoot = true) Path configDir) {
-        super(configDir);
+    public BungeeStatsLite(Plugin plugin) {
+        super(BungeeConfigProvider.INSTANCE);
         this.plugin = requireNonNull(plugin, "plugin");
     }
 
     @Override
     protected void register(int interval, TimeUnit unit) {
-        this.task = Sponge.getScheduler().createTaskBuilder()
-                .async()
-                .interval(interval, unit)
-                .execute(this)
-                .submit(this.plugin);
+        this.task = this.plugin.getProxy().getScheduler().schedule(this.plugin, this, 0, interval, unit);
     }
 
     @Override
@@ -88,12 +72,12 @@ public final class SpongeStatsLite extends StatsLite {
 
     @Override
     protected void handleException(String message, Exception e) {
-        this.plugin.getLogger().warn(message, e);
+        this.plugin.getLogger().log(Level.WARNING, message, e);
     }
 
     @Override
     protected void handleSubmitException(Exception e) {
-        this.plugin.getLogger().debug("Failed to submit plugin statistics: {}", Throwables.getRootCause(e).toString());
+        this.plugin.getLogger().log(Level.FINE, "Failed to submit plugin statistics: {0}", Throwables.getRootCause(e).toString());
     }
 
     @Override
@@ -104,29 +88,27 @@ public final class SpongeStatsLite extends StatsLite {
 
     @Override
     protected String getPluginName() {
-        return this.plugin.getName();
+        return this.plugin.getDescription().getName();
     }
 
     @Override
     protected String getPluginVersion() {
-        return this.plugin.getVersion();
+        return this.plugin.getDescription().getVersion();
     }
 
     @Override
     protected String getServerVersion() {
-        final Platform platform = Sponge.getPlatform();
-        return platform.getImplementation().getName() + ' ' + platform.getImplementation().getVersion()
-                + " (MC: " + platform.getMinecraftVersion().getName() + ')';
+        return this.plugin.getProxy().getVersion() + " (MC: " + this.plugin.getProxy().getGameVersion() + ')';
     }
 
     @Override
     protected int getOnlinePlayerCount() {
-        return Sponge.getServer().getOnlinePlayers().size();
+        return this.plugin.getProxy().getOnlineCount();
     }
 
     @Override
     protected boolean isOnlineMode() {
-        return Sponge.getServer().getOnlineMode();
+        return this.plugin.getProxy().getConfig().isOnlineMode();
     }
 
 }

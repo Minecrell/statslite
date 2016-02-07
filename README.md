@@ -26,15 +26,15 @@ repositories {
 }
 
 dependencies {
-    compile 'net.minecrell:statslite-PLATFORM:0.1'
+    compile 'net.minecrell.mcstats:statslite-PLATFORM:0.2'
 }
 
 shadowJar {
     dependencies {
-        include dependency('net.minecrell:statslite-PLATFORM')
+        include dependency('net.minecrell.mcstats:statslite-PLATFORM')
     }
     
-    relocate 'net.minecrell.statslite', 'YOUR.PLUGIN.PACKAGE.statslite'
+    relocate 'net.minecrell.mcstats', 'YOUR.PLUGIN.PACKAGE.mcstats'
 }
 
 artifacts {
