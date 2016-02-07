@@ -170,7 +170,11 @@ public abstract class StatsLite implements Runnable {
             post(this.config.getUniqueId(), this.ping);
             this.ping = true;
         } catch (Exception e) {
-            this.handleSubmitException(e);
+            if (DEBUG) {
+                this.handleException("Failed to submit plugin statistics", e);
+            } else {
+                this.handleSubmitException(e);
+            }
         }
     }
 
