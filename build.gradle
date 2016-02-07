@@ -3,7 +3,7 @@ plugins {
 }
 
 allprojects {
-    group = 'net.minecrell.statslite'
+    group = 'net.minecrell.mcstats'
     version = '0.2-SNAPSHOT'
 
     apply plugin: 'java'
