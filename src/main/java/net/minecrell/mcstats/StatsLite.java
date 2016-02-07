@@ -64,6 +64,8 @@ import java.util.zip.GZIPOutputStream;
  */
 public abstract class StatsLite implements Runnable {
 
+    public static final String VERSION = "0.2";
+
     private static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("mcstats.debug"));
     private static final String DEFAULT_CONFIG_FILE = "mcstats.properties";
 
@@ -153,7 +155,7 @@ public abstract class StatsLite implements Runnable {
         } catch (IOException e) {
             // If we can't read the configuration we can likely not
             // later either, so just stop trying
-            this.handleException("Failed to reload statslite configuration", e);
+            this.handleException("Failed to reload mcstats configuration", e);
             this.stop();
         }
 
