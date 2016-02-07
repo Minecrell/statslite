@@ -26,7 +26,7 @@ repositories {
 }
 
 dependencies {
-    compile 'net.minecrell.mcstats:statslite-PLATFORM:0.2'
+    compile 'net.minecrell.mcstats:statslite-PLATFORM:0.2.1'
 }
 
 shadowJar {
