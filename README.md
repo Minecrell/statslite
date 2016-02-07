@@ -59,7 +59,7 @@ public void onPreInitialize(GamePreInitializationEvent event) {
 }
 ```
 
-The client will generate a configuration file in `config/statslite.properties` where the users can opt-out the statistics.
+The client will generate a configuration file in `config/mcstats.properties` where the users can opt-out the statistics.
 
 #### BungeeCord
 Add the following to your plugin class:
