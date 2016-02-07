@@ -23,14 +23,14 @@ package net.minecrell.statslite;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -73,8 +73,6 @@ public abstract class StatsLite implements Runnable {
 
     private static final int PING_INTERVAL = 15; // In minutes
     private static final TimeUnit PING_INTERVAL_UNIT = TimeUnit.MINUTES;
-
-    private static final Gson gson = new Gson();
 
     private final ConfigProvider config;
 
@@ -268,31 +266,36 @@ public abstract class StatsLite implements Runnable {
         final int online = this.getOnlinePlayerCount();
         final boolean onlineMode = this.isOnlineMode();
 
-        // Create data object
-        JsonObject jsonData = new JsonObject();
+        final StringWriter writer = new StringWriter();
 
-        // Plugin and server information
-        jsonData.addProperty("guid", guid);
-        jsonData.addProperty("plugin_version", pluginVersion);
+        try (JsonWriter json = new JsonWriter(writer)) {
+            json.beginObject();
 
-        jsonData.addProperty("server_version", serverVersion);
-        jsonData.addProperty("players_online", online);
-        jsonData.addProperty("auth_mode", onlineMode);
+            // Plugin and server information
+            json.name("guid").value(guid);
+            json.name("plugin_version").value(pluginVersion);
 
-        // New data as of R6, system information
-        jsonData.addProperty("osname", System.getProperty("os.name"));
-        final String osArch = System.getProperty("os.arch");
-        jsonData.addProperty("osarch", osArch.equals("amd64") ? "x86_64" : osArch);
-        jsonData.addProperty("osversion", System.getProperty("os.version"));
-        jsonData.addProperty("cores", Runtime.getRuntime().availableProcessors());
-        jsonData.addProperty("java_version", System.getProperty("java.version"));
+            json.name("server_version").value(serverVersion);
+            json.name("players_online").value(online);
+            json.name("auth_mode").value(onlineMode);
 
-        if (ping) {
-            jsonData.addProperty("ping", true);
+            // New data as of R6, system information
+            json.name("osname").value(System.getProperty("os.name"));
+            final String osArch = System.getProperty("os.arch");
+            json.name("osarch").value(osArch.equals("amd64") ? "x86_64" : osArch);
+            json.name("osversion").value(System.getProperty("os.version"));
+            json.name("cores").value(Runtime.getRuntime().availableProcessors());
+            json.name("java_version").value(System.getProperty("java.version"));
+
+            if (ping) {
+                json.name("ping").value(true);
+            }
+
+            json.endObject();
         }
 
         // Get json output from GSON
-        String json = gson.toJson(jsonData);
+        final String json = writer.toString();
 
         if (DEBUG) {
             this.debug("Generated json request: " + json);
