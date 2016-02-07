@@ -173,11 +173,12 @@ public abstract class StatsLite implements Runnable {
     }
 
     /**
-     * Sends the specified message to a debug logger.
+     * Sends the specified message to the logger.
+     * <p><b>Note:</b> This should generally report on the <i>info</i> level.</p>
      *
      * @param message The message to log
      */
-    protected abstract void debug(String message);
+    protected abstract void log(String message);
 
     /**
      * Reports the exceptions together with the specified message on the logger.
@@ -298,7 +299,7 @@ public abstract class StatsLite implements Runnable {
         final String json = writer.toString();
 
         if (DEBUG) {
-            this.debug("Generated json request: " + json);
+            this.log("Generated json request: " + json);
         }
 
         byte[] data = json.getBytes(StandardCharsets.UTF_8);
@@ -327,7 +328,7 @@ public abstract class StatsLite implements Runnable {
         con.setDoOutput(true);
 
         if (DEBUG) {
-            this.debug("Sending " + data.length + " bytes to " + url);
+            this.log("Sending " + data.length + " bytes to " + url);
         }
 
         // Write json data to the opened stream
@@ -342,7 +343,7 @@ public abstract class StatsLite implements Runnable {
 
         if (DEBUG) {
             HttpURLConnection http = (HttpURLConnection) con;
-            this.debug("Server replied with '" + response + "' (" + http.getResponseCode() + " - " + http.getResponseMessage() + ')');
+            this.log("Server replied with '" + response + "' (" + http.getResponseCode() + " - " + http.getResponseMessage() + ')');
         }
 
         if (response == null || response.startsWith("ERR") || response.startsWith("7")) {

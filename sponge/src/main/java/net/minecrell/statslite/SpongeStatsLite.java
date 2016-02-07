@@ -82,8 +82,8 @@ public final class SpongeStatsLite extends StatsLite {
     }
 
     @Override
-    protected void debug(String message) {
-        this.plugin.getLogger().debug(message);
+    protected void log(String message) {
+        this.plugin.getLogger().info(message);
     }
 
     @Override

@@ -66,8 +66,8 @@ public final class BungeeStatsLite extends StatsLite {
     }
 
     @Override
-    protected void debug(String message) {
-        this.plugin.getLogger().log(Level.FINE, message);
+    protected void log(String message) {
+        this.plugin.getLogger().info(message);
     }
 
     @Override
