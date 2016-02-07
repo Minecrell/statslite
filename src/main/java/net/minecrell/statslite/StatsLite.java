@@ -64,7 +64,7 @@ import java.util.zip.GZIPOutputStream;
  */
 public abstract class StatsLite implements Runnable {
 
-    private static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("statslite.debug"));
+    private static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("mcstats.debug"));
     private static final String DEFAULT_CONFIG_FILE = "mcstats.properties";
 
     private static final int REVISION = 7; // Plugin-Metrics revision
