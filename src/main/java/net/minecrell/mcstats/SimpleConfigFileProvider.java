@@ -64,7 +64,7 @@ final class SimpleConfigFileProvider implements StatsLite.ConfigProvider {
             properties.put("guid", UUID.randomUUID().toString());
 
             try (OutputStream out = Files.newOutputStream(this.configFile, StandardOpenOption.CREATE)) {
-                properties.store(out, "StatsLite configuration, set opt-out to true to stop contacting http://mcstats.org");
+                properties.store(out, "Set opt-out to true to stop submitting plugin statistics to http://mcstats.org");
             }
         }
     }
