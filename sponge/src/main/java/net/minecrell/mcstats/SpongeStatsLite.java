@@ -120,9 +120,7 @@ public final class SpongeStatsLite extends StatsLite {
         StringBuilder result = new StringBuilder();
 
         result.append(platform.getImplementation().getName());
-        if (platform.getImplementation().getVersion().isPresent()) {
-            result.append(' ').append(platform.getImplementation().getVersion().get());
-        }
+        platform.getImplementation().getVersion().ifPresent(version -> result.append(' ').append(version));
         result.append(" (MC: ").append(platform.getMinecraftVersion().getName()).append(')');
 
         return result.toString();
