@@ -109,7 +109,7 @@ public final class SpongeStatsLite extends StatsLite {
 
     @Override
     protected String getPluginVersion() {
-        return this.plugin.getVersion();
+        return this.plugin.getVersion().isPresent() ? this.plugin.getVersion().get() : "unknown";
     }
 
     @Override
