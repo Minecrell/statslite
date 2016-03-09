@@ -13,7 +13,7 @@ statslite needs to be added as Maven or Gradle dependency, and later shaded and 
 Add something like the following to your `build.gradle`. Replace `PLATFORM` with the platform you want to use.
 ```gradle
 plugins {
-    id 'com.github.johnrengelman.shadow' version '1.2.2'
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
 }
 
 ...
@@ -26,7 +26,7 @@ repositories {
 }
 
 dependencies {
-    compile 'net.minecrell.mcstats:statslite-PLATFORM:0.2.1'
+    compile 'net.minecrell.mcstats:statslite-PLATFORM:0.2.2'
 }
 
 shadowJar {
