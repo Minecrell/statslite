@@ -65,7 +65,7 @@ import java.util.zip.GZIPOutputStream;
  */
 public abstract class StatsLite implements Runnable {
 
-    public static final String VERSION = "0.2.2";
+    public static final String VERSION = "0.2.3-SNAPSHOT";
 
     private static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("mcstats.debug"));
     private static final String DEFAULT_CONFIG_FILE = "mcstats.properties";
