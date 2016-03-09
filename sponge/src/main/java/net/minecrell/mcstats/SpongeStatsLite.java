@@ -110,14 +110,22 @@ public final class SpongeStatsLite extends StatsLite {
 
     @Override
     protected String getPluginVersion() {
-        return this.plugin.getVersion();
+        return this.plugin.getVersion().orElse("Unknown");
     }
 
     @Override
     protected String getServerVersion() {
         final Platform platform = Sponge.getPlatform();
-        return platform.getImplementation().getName() + ' ' + platform.getImplementation().getVersion()
-                + " (MC: " + platform.getMinecraftVersion().getName() + ')';
+
+        StringBuilder result = new StringBuilder();
+
+        result.append(platform.getImplementation().getName());
+        if (platform.getImplementation().getVersion().isPresent()) {
+            result.append(' ').append(platform.getImplementation().getVersion().get());
+        }
+        result.append(" (MC: ").append(platform.getMinecraftVersion().getName()).append(')');
+
+        return result.toString();
     }
 
     @Override
