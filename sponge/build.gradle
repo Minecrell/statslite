@@ -9,5 +9,5 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'org.spongepowered:spongeapi:4.0.3'
+    compileOnly 'org.spongepowered:spongeapi:7.0.0'
 }

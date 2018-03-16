@@ -23,6 +23,7 @@
 package net.minecrell.mcstats;
 
 import static java.util.Objects.requireNonNull;
+import static org.spongepowered.api.Platform.Component.IMPLEMENTATION;
 
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;
@@ -119,8 +120,8 @@ public final class SpongeStatsLite extends StatsLite {
 
         StringBuilder result = new StringBuilder();
 
-        result.append(platform.getImplementation().getName());
-        platform.getImplementation().getVersion().ifPresent(version -> result.append(' ').append(version));
+        result.append(platform.getContainer(IMPLEMENTATION).getName());
+        platform.getContainer(IMPLEMENTATION).getVersion().ifPresent(version -> result.append(' ').append(version));
         result.append(" (MC: ").append(platform.getMinecraftVersion().getName()).append(')');
 
         return result.toString();
