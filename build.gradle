@@ -13,13 +13,6 @@ allprojects {
     sourceCompatibility = '1.7'
     targetCompatibility = '1.7'
 
-    configurations { compileOnly }
-
-    sourceSets.main.compileClasspath += configurations.compileOnly
-    eclipse.classpath.plusConfigurations += [configurations.compileOnly]
-    idea.module.scopes.COMPILE.plus += [configurations.compileOnly]
-    javadoc.classpath = sourceSets.main.compileClasspath
-
     repositories {
         mavenCentral()
     }
@@ -32,6 +25,11 @@ allprojects {
     task javadocJar(type: Jar, dependsOn: 'javadoc') {
         classifier = 'javadoc'
         from javadoc.destinationDir
+    }
+
+    artifacts {
+        archives sourceJar
+        archives javadocJar
     }
 
     apply plugin: 'maven-publish'
