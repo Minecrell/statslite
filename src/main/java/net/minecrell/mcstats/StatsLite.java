@@ -173,8 +173,6 @@ public abstract class StatsLite implements Runnable {
         } catch (Exception e) {
             if (DEBUG) {
                 this.handleException("Failed to submit plugin statistics", e);
-            } else {
-                this.handleSubmitException(e);
             }
         }
     }
@@ -195,15 +193,6 @@ public abstract class StatsLite implements Runnable {
      * @param e The exception to log
      */
     protected abstract void handleException(String message, Exception e);
-
-    /**
-     * Reports an exception that has happened while submitting the statistic data
-     * on the logger.
-     * <p><b>Note:</b> This should generally report on the <i>debug</i> level.</p>
-     *
-     * @param e The exception to log
-     */
-    protected abstract void handleSubmitException(Exception e);
 
     /**
      * Cancels the scheduled task so it is no longer executed. This method is

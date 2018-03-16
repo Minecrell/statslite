@@ -24,7 +24,6 @@ package net.minecrell.mcstats;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.base.Throwables;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 
@@ -74,11 +73,6 @@ public final class BungeeStatsLite extends StatsLite {
     @Override
     protected void handleException(String message, Exception e) {
         this.plugin.getLogger().log(Level.WARNING, message, e);
-    }
-
-    @Override
-    protected void handleSubmitException(Exception e) {
-        this.plugin.getLogger().log(Level.FINE, "Failed to submit plugin statistics: {0}", Throwables.getRootCause(e).toString());
     }
 
     @Override

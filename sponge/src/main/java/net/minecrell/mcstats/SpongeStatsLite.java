@@ -25,7 +25,6 @@ package net.minecrell.mcstats;
 import static java.util.Objects.requireNonNull;
 import static org.spongepowered.api.Platform.Component.IMPLEMENTATION;
 
-import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.spongepowered.api.Platform;
@@ -91,11 +90,6 @@ public final class SpongeStatsLite extends StatsLite {
     @Override
     protected void handleException(String message, Exception e) {
         this.plugin.getLogger().warn(message, e);
-    }
-
-    @Override
-    protected void handleSubmitException(Exception e) {
-        this.plugin.getLogger().debug("Failed to submit plugin statistics: {}", Throwables.getRootCause(e).toString());
     }
 
     @Override
